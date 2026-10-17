@@ -1,0 +1,72 @@
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+import re,json
+root=Path(__file__).resolve().parents[1]/'public'
+html=(root/'index.html').read_text()
+html=re.sub(r'<script src="\./(?:install|app|studio|privacy-v5)\.js" defer></script>','',html)
+html=html.replace('<link rel="stylesheet" href="./focus-v5.css" />','<style>'+ (root/'focus-v5.css').read_text()+'</style>')
+store={}; successes=[]
+def chk(cond,name):
+ if not cond: raise AssertionError(name)
+ successes.append(name)
+with sync_playwright() as p:
+ b=p.chromium.launch(headless=True,args=['--no-sandbox'])
+ def openpg(width=390):
+  pg=b.new_page(viewport={'width':width,'height':844 if width==390 else 900},device_scale_factor=1)
+  errors=[];pg.on('pageerror',lambda e:errors.append(str(e)))
+  pg.set_content(html,wait_until='domcontentloaded')
+  pg.evaluate('''s=>{Object.defineProperty(window,'localStorage',{configurable:true,value:{storage:s,getItem(k){return this.storage[k]??null},setItem(k,v){this.storage[k]=v},removeItem(k){delete this.storage[k]}}});Object.defineProperty(window,'indexedDB',{configurable:true,value:undefined});}''',store)
+  for n in ['install.js','app.js','studio.js','privacy-v5.js']: pg.add_script_tag(content=(root/n).read_text())
+  return pg,errors
+ page,errors=openpg()
+ chk('FOCUS' in page.title(),'アプリ名 FOCUS')
+ chk(not page.locator('[data-tab="reward"]').is_visible(),'交換メニューが通常画面で非表示')
+ chk(not page.locator('#archiveFolderInput').is_visible(),'アーカイブ接続先設定が通常画面で非表示')
+ for f in ['index.html','app.js','studio.js','privacy-v5.js']:
+  s=(root/f).read_text()
+  chk(not re.search(r'(?:docs\.google\.com/(?:spreadsheets|presentation)/d/|drive\.google\.com/drive/folders/)[A-Za-z0-9_-]{15,}',s),'個人ID非埋込 '+f)
+ store={'focus-reward-v1':json.dumps({'points':5,'sessions':[{'when':1760664000000,'minutes':25,'earned':2,'task':'旧作業'}],'gallery':[],'focus':{'status':'idle','minutes':25,'remainingMs':1500000,'endAt':None,'task':''},'chatUrl':''},ensure_ascii=False)}
+ page.close();page,errors=openpg()
+ chk(page.locator('#balance').inner_text()=='5','旧版ポイント読み込み')
+ page.get_by_role('button',name='設定',exact=True).click();page.locator('#privateUnlock').click();page.get_by_role('button',name='設定',exact=True).click()
+ chk(page.locator('#archiveFolderInput').is_visible(),'プライベートの設定表示')
+ chk(page.locator('#archiveFolderLink').is_hidden(),'未設定時は外部リンクを表示しない')
+ page.locator('#archiveFolderInput').fill('https://example.com/drive/folders/abc')
+ page.locator('#saveArchiveConfig').click()
+ chk(page.locator('#archiveFolderLink').is_hidden(),'外部ドメインを拒否')
+ folder='https://drive.google.com/drive/folders/TEST';ledger='https://docs.google.com/spreadsheets/d/TEST/edit'
+ page.locator('#archiveFolderInput').fill(folder);page.locator('#archiveLedgerInput').fill(ledger);page.locator('#saveArchiveConfig').click()
+ chk(page.locator('#archiveFolderLink').get_attribute('href')==folder,'フォルダの個別保存')
+ chk(page.locator('#archiveLedgerLink').get_attribute('href')==ledger,'管理台帳の個別保存')
+ store=page.evaluate('localStorage.storage')
+ page.close();page,errors=openpg()
+ chk(not page.locator('[data-tab="reward"]').is_visible(),'再読み込み後はロック状態')
+ page.get_by_role('button',name='設定',exact=True).click();page.locator('#privateUnlock').click();page.get_by_role('button',name='設定',exact=True).click()
+ chk(page.locator('#archiveFolderInput').input_value()==folder,'保存したリンクを復元')
+ page.locator('[data-tab="gallery"]').click()
+ chk(page.locator('#archiveFolderLink').get_attribute('href')==folder,'プライベート履歴のリンク動作')
+ page.locator('[data-tab="focus"]').click()
+ chk(not page.locator('[data-tab="gallery"]').is_visible(),'集中画面に戻ると再ロック')
+ # Timers
+ page.locator('[data-mode=quick]').click();page.locator('[data-min="5"]').click()
+ chk(page.locator('#timerTime').inner_text()=='05:00','5分タイマー設定')
+ page.locator('#startBtn').click()
+ store=page.evaluate('localStorage.storage'); obj=json.loads(store['focus-reward-v1']);obj['focus']['endAt']=0;store['focus-reward-v1']=json.dumps(obj,ensure_ascii=False)
+ page.close();page,errors=openpg()
+ chk(page.locator('#awardBtn').count()==1,'5分タイマー完走')
+ page.locator('#awardBtn').click()
+ chk(page.locator('#balance').inner_text()=='5','5分で不正なポイント加算なし')
+ page.locator('[data-mode=pomodoro]').click();page.locator('#startBtn').click()
+ store=page.evaluate('localStorage.storage');obj=json.loads(store['focus-reward-v1']);obj['focus']['endAt']=0;store['focus-reward-v1']=json.dumps(obj,ensure_ascii=False)
+ page.close();page,errors=openpg();page.locator('#awardBtn').click()
+ chk(page.locator('#balance').inner_text()=='7','25分で2pt加算')
+ chk(page.locator('#breakStart').count()==1,'ポモドーロ休憩ボタン')
+ page.locator('#breakStart').click()
+ chk('休憩中' in page.locator('#timerStatus').inner_text(),'休憩モード')
+ chk(not errors,'JS実行時エラーなし: '+repr(errors))
+ page.locator('#skipBreak').click();page.screenshot(path='/tmp/focus-v5.2-test-mobile.png',full_page=True)
+ page.close();page,errors=openpg(1280)
+ page.screenshot(path='/tmp/focus-v5.2-test-desktop.png',full_page=True)
+ chk(not errors,'デスクトップJSエラーなし: '+repr(errors))
+ b.close()
+print('\n'.join('PASS '+x for x in successes));print('TESTS',len(successes))
