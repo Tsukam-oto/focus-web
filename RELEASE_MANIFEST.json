@@ -1,0 +1,18 @@
+{
+  "version": "5.7-work1",
+  "public_files": {
+    ".nojekyll": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "app.js": "486e3952ea5c8c259c11fd970944ba9519af5e330853339523f0a776eb39e1e8",
+    "creative-archive.js": "349208a55c4b633b4bab79928cc2cb7cb600db9f98d83a9bd3840f8adc62d14f",
+    "creative.js": "090d4a0be9e32b7e0d8cb8ef0fa9fa405cd9a63bc93750e63e111c1b38d16089",
+    "focus-v5.css": "852bcc9a56cd71df2c59dd671e1e2ed9b726f73767070f0cbe4984b00b3a35f3",
+    "icon-192.png": "ffaea9ca80aae2475df8d61b531ecf9bf94e542587a41aff04f6e71944ecc5ce",
+    "icon-512.png": "0aecc034fb286c4be5cd1797675ddbd7a25ab71c35db2c65724bf540438fba93",
+    "index.html": "1b3eda918e4858fe76938d57c004f67597134984c723a3ae1c6a6f4f951d5819",
+    "install.js": "ba3159fa25c169ee3ce75008e51a70af1c2bd837f76c62de66eee0def2db1cf2",
+    "manifest.webmanifest": "5b719d8f04d0d0f7d7dcbe35c4c6d2845957d41a492d5d08ed6257aef2514550",
+    "privacy-v5.js": "e92cae731fc5863d342ce8bbc288846536305e23545aac7a50b466634176d97f",
+    "service-worker.js": "5166999601551c39c77f24c426ccde58243de0f47a0236f3847126e6cdbf7ada",
+    "studio.js": "c8f1dd48dc9e13bb24b6d2bea5a4fe730e23bb32bb4d8506a279c87a69045409"
+  }
+}
