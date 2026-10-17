@@ -66,7 +66,7 @@ async function importAll(file){if(!file)return;const btn=$('creativeArchiveImpor
  // Upload audio first; if storage fails, the current text notes remain untouched.
  const existingIds=new Set((await window.FocusCreative.getAudios()).map(a=>a.id));
  for(const a of verified){await window.FocusCreative.putAudio({id:existingIds.has(a.id)?crypto.randomUUID():a.id,title:String(a.title||'録音').slice(0,120),when:String(a.when||new Date().toISOString()),project:String(a.project||'').slice(0,50),mime:a.blob.type,blob:a.blob})}
- window.FocusCreative.restorePackage(head.workspace);await window.FocusCreative.renderAudios();
+ if(window.FocusCreative.restorePackage(head.workspace)===false)throw Error('制作メモの復元に失敗しました。別タブを閉じるか空き容量を確保してください');await window.FocusCreative.renderAudios();
  status('制作ZIPからメモと録音 '+verified.length+'件を復元しました。');
 }catch(e){status('制作ZIPの復元に失敗しました: '+(e.message||e)+'（音声が一部登録された可能性があります）')}finally{btn.disabled=false;$('creativeArchiveFile').value=''}}
 $('creativeArchiveExport').addEventListener('click',exportAll);

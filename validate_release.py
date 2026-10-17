@@ -44,7 +44,7 @@ else:
             if f'src="./{script}"' not in html: errors.append(script+' の読み込みがありません')
     if (PUBLIC/'service-worker.js').exists():
         sw=(PUBLIC/'service-worker.js').read_text()
-        if 'focus-shell-v5-7' not in sw: errors.append('Service Worker のキャッシュバージョンを確認してください')
+        if 'focus-shell-v5-8' not in sw: errors.append('Service Worker のキャッシュバージョンを確認してください')
 workflow=PROJECT/'.github/workflows/pages.yml'
 if not workflow.exists() or 'path: ./public' not in workflow.read_text():
     errors.append('Pagesデプロイは public/ のみを配信対象にしてください')
@@ -53,6 +53,18 @@ for file in PUBLIC.iterdir():
         text=file.read_text()
         if re.search(r'(?:docs\.google\.com/(?:spreadsheets|presentation)/d/|drive\.google\.com/drive/folders/)[A-Za-z0-9_-]{15,}',text):
             errors.append('コードに個人Google Driveの具体IDが含まれています: '+file.name)
+manifest_path=PROJECT/'RELEASE_MANIFEST.json'
+try:
+    release=json.loads(manifest_path.read_text())
+    hashes=release['public_files']
+    if set(hashes)!=ALLOWED: errors.append('公開アセットのハッシュ台帳が不一致です')
+    for name, digest in hashes.items():
+        if name not in ALLOWED: continue
+        target=PUBLIC/name
+        if not target.is_file() or hashlib.sha256(target.read_bytes()).hexdigest()!=digest:
+            errors.append('SHA-256が一致しません: '+name)
+except (OSError, ValueError, KeyError, TypeError):
+    errors.append('公開アセットのハッシュ台帳を読めません')
 if errors:
     print('FAIL:', '\n- '+'\n- '.join(errors),file=sys.stderr)
     sys.exit(1)

@@ -1,4 +1,4 @@
-const CACHE='focus-shell-v5-7-work1';
+const CACHE='focus-shell-v5-8-work2';
 const FILES=['./','./index.html','./app.js','./studio.js','./creative.js','./creative-archive.js','./install.js','./privacy-v5.js','./focus-v5.css','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('focus-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
