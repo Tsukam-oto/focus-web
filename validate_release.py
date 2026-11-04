@@ -11,7 +11,7 @@ import sys
 PROJECT = Path(__file__).resolve().parent
 PUBLIC = PROJECT / 'public'
 ALLOWED = {
-    '.nojekyll', 'index.html', 'app.js', 'studio.js', 'creative.js', 'creative-archive.js', 'install.js',
+    '.nojekyll', 'mimi-history/index.html', 'index.html', 'app.js', 'studio.js', 'creative.js', 'creative-archive.js', 'install.js',
     'service-worker.js', 'privacy-v5.js', 'focus-v5.css', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'
 }
 EXPECTED_ICONS = {
