@@ -1,5 +1,5 @@
 {
-  "version": "5.8-work2",
+  "version": "5.8-work2 + record-shelf-v0.3",
   "public_files": {
     ".nojekyll": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "app.js": "2148e179c8aefc0f864953baa674b60fc9dcdfbcd35ec8498952eb6736345198",
@@ -15,6 +15,6 @@
     "service-worker.js": "b1427ffcb94b59cca9c2a6917a6f857c6c6d880f5a3eec44873e565eea24ac92",
     "studio.js": "c8f1dd48dc9e13bb24b6d2bea5a4fe730e23bb32bb4d8506a279c87a69045409",
     "mimi-history/index.html": "3192ef08f6731db8ce46a34b2864cc1bd39eaa642ce71c14e86353769a62ae06",
-    "record-shelf/index.html": "402f55c40188e82d19217fcfe2d8e33203c1c1a932844836bdefe471d5146434"
+    "record-shelf/index.html": "345d7b139696beebcbd90968cfe167eef016a5e740c3483a6a375dba5b38fbdf"
   }
 }
