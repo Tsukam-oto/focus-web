@@ -11,7 +11,7 @@ import sys
 PROJECT = Path(__file__).resolve().parent
 PUBLIC = PROJECT / 'public'
 ALLOWED = {
-    '.nojekyll', 'mimi-history/index.html', 'index.html', 'app.js', 'studio.js', 'creative.js', 'creative-archive.js', 'install.js',
+    '.nojekyll', 'mimi-history/index.html', 'record-shelf/index.html', 'index.html', 'app.js', 'studio.js', 'creative.js', 'creative-archive.js', 'install.js',
     'service-worker.js', 'privacy-v5.js', 'focus-v5.css', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'
 }
 EXPECTED_ICONS = {
@@ -48,8 +48,8 @@ else:
 workflow=PROJECT/'.github/workflows/pages.yml'
 if not workflow.exists() or 'path: ./public' not in workflow.read_text():
     errors.append('Pagesデプロイは public/ のみを配信対象にしてください')
-for file in PUBLIC.iterdir():
-    if file.suffix in ('.js','.html','.css','.webmanifest'):
+for file in PUBLIC.rglob('*'):
+    if file.is_file() and file.suffix in ('.js','.html','.css','.webmanifest'):
         text=file.read_text()
         if re.search(r'(?:docs\.google\.com/(?:spreadsheets|presentation)/d/|drive\.google\.com/drive/folders/)[A-Za-z0-9_-]{15,}',text):
             errors.append('コードに個人Google Driveの具体IDが含まれています: '+file.name)
@@ -68,4 +68,4 @@ except (OSError, ValueError, KeyError, TypeError):
 if errors:
     print('FAIL:', '\n- '+'\n- '.join(errors),file=sys.stderr)
     sys.exit(1)
-print('PASS: 配信ファイルは指定の13個のみです。人物写真、バックアップ、テスト画像は含まれません。')
+print('PASS: 配信ファイルは指定の14個のみです。人物写真、バックアップ、テスト画像は含まれません。')

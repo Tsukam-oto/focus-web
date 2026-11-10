@@ -14,6 +14,7 @@
     "privacy-v5.js": "e92cae731fc5863d342ce8bbc288846536305e23545aac7a50b466634176d97f",
     "service-worker.js": "b1427ffcb94b59cca9c2a6917a6f857c6c6d880f5a3eec44873e565eea24ac92",
     "studio.js": "c8f1dd48dc9e13bb24b6d2bea5a4fe730e23bb32bb4d8506a279c87a69045409",
-    "mimi-history/index.html": "3192ef08f6731db8ce46a34b2864cc1bd39eaa642ce71c14e86353769a62ae06"
+    "mimi-history/index.html": "3192ef08f6731db8ce46a34b2864cc1bd39eaa642ce71c14e86353769a62ae06",
+    "record-shelf/index.html": "402f55c40188e82d19217fcfe2d8e33203c1c1a932844836bdefe471d5146434"
   }
 }
